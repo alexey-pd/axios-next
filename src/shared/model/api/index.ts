@@ -35,9 +35,9 @@ export const ClientInitFx = attach({
 });
 
 export const getFactFx: Effect<void, string | undefined> = attach({
-  source: { api: $client },
-  async effect({ api }) {
-    const fact = request(api).fact();
+  source: { client: $client },
+  async effect({ client }) {
+    const fact = request(client).fact();
     return fact;
   },
 });
