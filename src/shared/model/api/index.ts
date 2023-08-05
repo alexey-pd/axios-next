@@ -1,22 +1,15 @@
-import {
-  createStore,
-  createEvent,
-  sample,
-  attach,
-  restore,
-  Effect,
-} from "effector";
+import { createStore, createEvent, attach, restore, Effect } from "effector";
 import axios, { AxiosInstance, InternalAxiosRequestConfig } from "axios";
 export const authTokenChanged = createEvent<string>();
 export const $authToken = restore(authTokenChanged, "");
 
-export const $axios = createStore<AxiosInstance | null>(null, {
+export const $client = createStore<AxiosInstance | null>(null, {
   serialize: "ignore",
 });
 
 export const appInited = createEvent();
 
-const AxiosInitFx = attach({
+export const ClientInitFx = attach({
   source: { authToken: $authToken },
   effect({ authToken }) {
     const instance = axios.create({
@@ -39,11 +32,8 @@ const AxiosInitFx = attach({
   },
 });
 
-sample({ clock: [appInited, authTokenChanged], target: AxiosInitFx });
-sample({ clock: AxiosInitFx.doneData, target: $axios });
-
 export const getFactFx: Effect<void, string | undefined> = attach({
-  source: { api: $axios },
+  source: { api: $client },
   async effect({ api }) {
     const res = await api?.get<{ fact: string }>("fact");
     return res?.data.fact;
@@ -51,4 +41,3 @@ export const getFactFx: Effect<void, string | undefined> = attach({
 });
 
 export const $fact = restore(getFactFx.doneData, "");
-AxiosInitFx.done.watch(() => console.log("axios inited"));

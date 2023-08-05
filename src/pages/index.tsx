@@ -6,7 +6,7 @@ import {
   appInited,
   getFactFx,
   $fact,
-} from "~/api";
+} from "~/shared/model/api";
 import Image from "next/image";
 
 const Page = () => {
