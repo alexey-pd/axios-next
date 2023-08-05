@@ -1,16 +1,18 @@
 import { fork, allSettled, serialize } from "effector";
-import { useUnit } from "effector-react";
+import { useUnit, useGate } from "effector-react";
 import {
   $authToken,
   authTokenChanged,
   appInited,
   getFactFx,
   $fact,
+  PageGate,
 } from "~/shared/model/api";
 import Image from "next/image";
 
 const Page = () => {
-  const { fact } = useUnit({ fact: $fact });
+  const { fact, getFact } = useUnit({ fact: $fact, getFact: getFactFx });
+  useGate(PageGate);
 
   return (
     <div
@@ -30,7 +32,10 @@ const Page = () => {
         height={100}
         alt="Stare cat"
       />
-      <p>{fact}</p>
+      <p className="m-5">{fact}</p>
+      <button onClick={getFact} className="px-10 py-2 bg-neutral-300">
+        meoww
+      </button>
     </div>
   );
 };

@@ -1,6 +1,7 @@
 import { createStore, createEvent, attach, restore, Effect } from "effector";
 import axios, { AxiosInstance, InternalAxiosRequestConfig } from "axios";
 import { request } from "./request";
+import { createGate } from "effector-react";
 
 export const authTokenChanged = createEvent<string>();
 export const $authToken = restore(authTokenChanged, "");
@@ -43,3 +44,5 @@ export const getFactFx: Effect<void, string | undefined> = attach({
 });
 
 export const $fact = restore(getFactFx.doneData, "");
+
+export const PageGate = createGate();
