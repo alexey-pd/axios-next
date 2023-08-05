@@ -1,5 +1,7 @@
 import { createStore, createEvent, attach, restore, Effect } from "effector";
 import axios, { AxiosInstance, InternalAxiosRequestConfig } from "axios";
+import { request } from "./request";
+
 export const authTokenChanged = createEvent<string>();
 export const $authToken = restore(authTokenChanged, "");
 
@@ -35,8 +37,8 @@ export const ClientInitFx = attach({
 export const getFactFx: Effect<void, string | undefined> = attach({
   source: { api: $client },
   async effect({ api }) {
-    const res = await api?.get<{ fact: string }>("fact");
-    return res?.data.fact;
+    const fact = request(api).fact();
+    return fact;
   },
 });
 
