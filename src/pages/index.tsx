@@ -20,7 +20,7 @@ const Page = () => {
         alignItems: "center",
         maxWidth: 500,
         padding: 20,
-        font: "22px Borel, cursive",
+        font: "2rem Handjet, cursive",
         margin: "auto",
       }}
     >

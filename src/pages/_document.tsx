@@ -5,9 +5,8 @@ export default function Document() {
     <Html>
       <Head>
         <link
-          href="https://fonts.googleapis.com/css2?family=Borel&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Handjet:wght@300&display=swap"
           rel="stylesheet"
-          crossOrigin="anonymous"
         />
       </Head>
       <body>
