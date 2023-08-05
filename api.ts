@@ -7,7 +7,8 @@ import {
   Effect,
 } from "effector";
 import axios, { AxiosInstance, InternalAxiosRequestConfig } from "axios";
-export const $authToken = createStore("000");
+export const authTokenChanged = createEvent<string>();
+export const $authToken = restore(authTokenChanged, "");
 
 export const $axios = createStore<AxiosInstance | null>(null, {
   serialize: "ignore",
@@ -22,9 +23,14 @@ const AxiosInitFx = attach({
       baseURL: "https://catfact.ninja",
     });
 
-    instance.interceptors.request.use((config: InternalAxiosRequestConfig) => {
-      config.headers["Authorization"] = `Bearer ${authToken}`;
-      return config;
+    instance.interceptors.request.use((req: InternalAxiosRequestConfig) => {
+      if (authToken) {
+        req.headers["Authorization"] = `Bearer ${authToken}`;
+      }
+
+      console.log("request headers", req.headers);
+
+      return req;
     });
 
     instance.interceptors.response.use((res) => res);
@@ -33,7 +39,7 @@ const AxiosInitFx = attach({
   },
 });
 
-sample({ clock: appInited, target: AxiosInitFx });
+sample({ clock: [appInited, authTokenChanged], target: AxiosInitFx });
 sample({ clock: AxiosInitFx.doneData, target: $axios });
 
 export const getFactFx: Effect<void, string | undefined> = attach({
@@ -45,3 +51,4 @@ export const getFactFx: Effect<void, string | undefined> = attach({
 });
 
 export const $fact = restore(getFactFx.doneData, "");
+AxiosInitFx.done.watch(() => console.log("axios inited"));

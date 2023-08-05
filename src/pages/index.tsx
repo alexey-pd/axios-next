@@ -1,6 +1,12 @@
 import { fork, allSettled, serialize } from "effector";
 import { useUnit } from "effector-react";
-import { $authToken, appInited, getFactFx, $fact } from "../../api";
+import {
+  $authToken,
+  authTokenChanged,
+  appInited,
+  getFactFx,
+  $fact,
+} from "../../api";
 import Image from "next/image";
 
 const Page = () => {
@@ -15,7 +21,7 @@ const Page = () => {
         maxWidth: 500,
         padding: 20,
         font: "22px Borel, cursive",
-        margin: 'auto'
+        margin: "auto",
       }}
     >
       <Image
@@ -32,11 +38,15 @@ const Page = () => {
 export default Page;
 
 export async function getServerSideProps() {
+  const authToken = "";
   const scope = fork({
-    values: [[$authToken, "server token"]],
+    values: [[$authToken, authToken]],
   });
 
   await allSettled(appInited, { scope });
+  await allSettled(getFactFx, { scope });
+
+  await allSettled(authTokenChanged, { scope, params: "token" });
   await allSettled(getFactFx, { scope });
 
   return {
