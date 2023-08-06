@@ -1,18 +1,21 @@
 import { fork, allSettled, serialize } from "effector";
-import { useUnit, useGate } from "effector-react";
-import {
-  $authToken,
-  authTokenChanged,
-  appInited,
-  getFactFx,
-  $fact,
-  PageGate,
-} from "~/shared/model/api";
+import { useUnit } from "effector-react";
+import { $authToken, authTokenChanged } from "~/shared/model/api";
+import { pageInited } from "~/shared/model/page";
+import { getFactFx, $fact } from "~/shared/model/fact";
 import Image from "next/image";
+import { useDebouncedCallback } from "use-debounce";
 
 const Page = () => {
-  const { fact, getFact } = useUnit({ fact: $fact, getFact: getFactFx });
-  useGate(PageGate);
+  const { fact, getFact, disabled } = useUnit({
+    fact: $fact,
+    getFact: getFactFx,
+    disabled: getFactFx.pending,
+  });
+
+  const debounced = useDebouncedCallback(() => {
+    getFact();
+  }, 1000);
 
   return (
     <div
@@ -20,10 +23,12 @@ const Page = () => {
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
+        justifyContent: "space-between",
         maxWidth: 500,
         padding: 20,
         font: "2rem Handjet, cursive",
         margin: "auto",
+        height: "100%",
       }}
     >
       <Image
@@ -32,10 +37,14 @@ const Page = () => {
         height={100}
         alt="Stare cat"
       />
-      <p className="m-5">{fact}</p>
-      <button onClick={getFact} className="px-10 py-2 bg-neutral-300">
+      <button
+        onClick={debounced}
+        disabled={disabled}
+        className="px-10 py-2 mt-5 bg-neutral-300"
+      >
         meoww
       </button>
+      <p className="m-10">{fact}</p>
     </div>
   );
 };
@@ -48,7 +57,7 @@ export async function getServerSideProps() {
     values: [[$authToken, authToken]],
   });
 
-  await allSettled(appInited, { scope });
+  await allSettled(pageInited, { scope });
   await allSettled(getFactFx, { scope });
 
   await allSettled(authTokenChanged, { scope, params: "token" });

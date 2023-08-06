@@ -1,23 +1,22 @@
-import { createStore, createEvent, attach, restore, Effect } from "effector";
+import { createStore, createEvent, attach, restore } from "effector";
 import axios, { AxiosInstance, InternalAxiosRequestConfig } from "axios";
-import { request } from "./request";
-import { createGate } from "effector-react";
 
 export const authTokenChanged = createEvent<string>();
 export const $authToken = restore(authTokenChanged, "");
 
-export const $client = createStore<AxiosInstance | null>(null, {
+const createClient = () =>
+  axios.create({
+    baseURL: "https://catfact.ninja",
+  });
+
+export const $client = createStore<AxiosInstance>(createClient(), {
   serialize: "ignore",
 });
-
-export const appInited = createEvent();
 
 export const ClientInitFx = attach({
   source: { authToken: $authToken },
   effect({ authToken }) {
-    const instance = axios.create({
-      baseURL: "https://catfact.ninja",
-    });
+    const instance = createClient();
 
     instance.interceptors.request.use((req: InternalAxiosRequestConfig) => {
       if (authToken) {
@@ -29,20 +28,14 @@ export const ClientInitFx = attach({
       return req;
     });
 
-    instance.interceptors.response.use((res) => res);
+    instance.interceptors.response.use((res) => {
+      if (res.status === 200) {
+        return res.data;
+      }
+
+      return res;
+    });
 
     return instance;
   },
 });
-
-export const getFactFx: Effect<void, string | undefined> = attach({
-  source: { client: $client },
-  async effect({ client }) {
-    const fact = request(client).fact();
-    return fact;
-  },
-});
-
-export const $fact = restore(getFactFx.doneData, "");
-
-export const PageGate = createGate();

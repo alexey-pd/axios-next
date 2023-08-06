@@ -1,17 +1,22 @@
 import { sample } from "effector";
-import {
-  appInited,
-  authTokenChanged,
-  ClientInitFx,
-  $client,
-  PageGate,
-} from ".";
+import { authTokenChanged, ClientInitFx, $client, $authToken } from ".";
 
-sample({ clock: [appInited, authTokenChanged], target: ClientInitFx });
-sample({ clock: ClientInitFx.doneData, target: $client });
+import { pageInited } from "~/shared/model/page";
+
 sample({
-  clock: PageGate.open,
-  target: appInited,
+  clock: [pageInited, authTokenChanged],
+  source: $authToken,
+  filter: (authToken) => Boolean(authToken),
+  target: ClientInitFx,
 });
 
-ClientInitFx.done.watch(() => console.log("axios inited"));
+sample({
+  clock: [pageInited],
+  target: ClientInitFx,
+});
+
+sample({ clock: ClientInitFx.doneData, target: $client });
+
+ClientInitFx.done.watch(({ params }) =>
+  console.log("axios inited with params:", params)
+);

@@ -9,7 +9,13 @@ export default function Document() {
           rel="stylesheet"
         />
       </Head>
-      <body>
+      <body
+        style={{
+          height: "100%",
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
         <Main />
         <NextScript />
       </body>
