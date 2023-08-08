@@ -19,6 +19,4 @@ export const readFactFx = attach({
   },
 });
 
-getFactFx.failData.watch(console.log);
-
 export const $fact = restore(getFactFx.doneData, "");
