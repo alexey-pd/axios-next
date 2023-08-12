@@ -1,7 +1,6 @@
 import { EffectorNext } from "@effector/next";
 import type { AppProps } from "next/app";
 import "tailwindcss/tailwind.css";
-import "~/shared/model";
 import { PageGate } from "~/shared/model/page";
 
 export default function App({ Component, pageProps }: AppProps) {
