@@ -2,14 +2,14 @@ import { fork, allSettled, serialize } from "effector";
 import { useUnit } from "effector-react";
 import { $authToken, authTokenChanged } from "~/shared/model/api";
 import { pageInited } from "~/shared/model/page";
-import { readFactFx, $fact } from "~/shared/model/fact";
+import { readFactFired, readFactFx, $fact } from "~/shared/model/fact";
 import Image from "next/image";
 import { useDebouncedCallback } from "use-debounce";
 
 const Page = () => {
   const { fact, readFact, disabled } = useUnit({
     fact: $fact,
-    readFact: readFactFx,
+    readFact: readFactFired,
     disabled: readFactFx.pending,
   });
 
@@ -58,14 +58,18 @@ export async function getServerSideProps() {
   });
 
   await allSettled(pageInited, { scope });
-  await allSettled(readFactFx, { scope });
+  await allSettled(readFactFired, { scope });
 
   await allSettled(authTokenChanged, { scope, params: "token" });
-  await allSettled(readFactFx, { scope });
+  await allSettled(readFactFired, { scope });
+
+  const values = serialize(scope);
+
+  console.log("values", values);
 
   return {
     props: {
-      values: serialize(scope),
+      values,
     },
   };
 }

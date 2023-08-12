@@ -1,16 +1,22 @@
 import { createStore, createEvent, attach, restore } from "effector";
-import axios, { AxiosInstance, InternalAxiosRequestConfig } from "axios";
+import axios, {
+  AxiosInstance,
+  AxiosRequestConfig,
+  InternalAxiosRequestConfig,
+} from "axios";
 
 export const authTokenChanged = createEvent<string>();
 export const $authToken = restore(authTokenChanged, "");
+import { IRequestMethod } from "./request";
 
-const createClient = () =>
-  axios.create({
-    baseURL: "https://catfact.ninja",
-  });
+const createClient = () => axios.create();
 
 export const $client = createStore<AxiosInstance>(createClient(), {
   serialize: "ignore",
+});
+
+const $config = createStore({
+  baseURL: "https://catfact.ninja",
 });
 
 export const ClientInitFx = attach({
@@ -39,3 +45,19 @@ export const ClientInitFx = attach({
     return instance;
   },
 });
+
+export const createRequestFx = <Params = void, Result = any>(
+  url: IRequestMethod,
+  params?: Params
+) => {
+  return attach({
+    source: { client: $client, config: $config },
+    async effect({ client, config }) {
+      const res = await client.request<Result, Result>(
+        Object.assign({ url, params }, config)
+      );
+
+      return res;
+    },
+  });
+};
