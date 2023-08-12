@@ -12,6 +12,7 @@ export const $fact = createStore("");
 
 sample({
   clock: readFactFired,
+  fn: () => ({}),
   target: readFactFx,
 });
 
