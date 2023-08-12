@@ -1,12 +1,22 @@
-import { attach, restore } from "effector";
-import { request } from "~/shared/model/api/request";
-import { $client } from "~/shared/model/api";
+import { createEvent, createStore, sample } from "effector";
+import { createRequestFx } from "~/shared/model/api";
 
-export const readFactFx = attach({
-  source: { client: $client },
-  async effect({ client }) {
-    return request(client).fact();
-  },
+export const readFactFired = createEvent();
+
+export const readFactFx = createRequestFx<
+  void,
+  { fact: string; length: number }
+>("fact");
+
+export const $fact = createStore("");
+
+sample({
+  clock: readFactFired,
+  target: readFactFx,
 });
 
-export const $fact = restore(readFactFx.doneData, "");
+sample({
+  clock: readFactFx.doneData,
+  fn: ({ fact }) => fact,
+  target: $fact,
+});
