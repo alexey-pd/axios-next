@@ -9,15 +9,15 @@ const $baseConfig = createStore<AxiosRequestConfig>({
   baseURL: "https://catfact.ninja",
 });
 
-export const createRequestFx = <Params = void, Result = any>(
+export const createRequestFx = <Params = void, Result = any, Data = any>(
   url: IRequestMethod,
   config?: AxiosRequestConfig
 ) => {
   return attach({
     source: { baseConfig: $baseConfig },
-    async effect({ baseConfig }, params: Params) {
+    async effect({ baseConfig }, { params, data }: { params?: Params; data?: Data }) {
       const res = await client.request<Result, Result>(
-        Object.assign(baseConfig, { url, params }, config)
+        Object.assign(baseConfig, { url, params, data }, config)
       );
 
       return res;
