@@ -11,12 +11,11 @@ const $baseConfig = createStore<AxiosRequestConfig>({
 
 export const createRequestFx = <Params = void, Result = any>(
   url: IRequestMethod,
-  params?: Params,
   config?: AxiosRequestConfig
 ) => {
   return attach({
     source: { baseConfig: $baseConfig },
-    async effect({ baseConfig }) {
+    async effect({ baseConfig }, params: Params) {
       const res = await client.request<Result, Result>(
         Object.assign(baseConfig, { url, params }, config)
       );
